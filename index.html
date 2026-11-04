@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self-Perception Experiment</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pinky: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                            700: '#be123c',
+                            800: '#9f1239',
+                            900: '#881337',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #fff5f7 0%, #fce7f3 50%, #ffe4e6 100%);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* Smooth Card Animations */
+        .card-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Custom Scrollbar for Textarea & Admin */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fff1f2;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #fda4af;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #fb7185;
+        }
+
+        /* Pulse glow animation for CTA buttons */
+        @keyframes subtle-glow {
+            0%, 100% { box-shadow: 0 4px 20px -2px rgba(244, 63, 94, 0.35); }
+            50% { box-shadow: 0 4px 28px 2px rgba(244, 63, 94, 0.55); }
+        }
+        .glow-btn {
+            animation: subtle-glow 3s infinite;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen justify-between items-center p-4 sm:p-6 text-slate-800 antialiased">
+
+    <!-- Top Bar Navigation -->
+    <header class="w-full max-w-2xl flex justify-between items-center py-2 px-1">
+        <div class="flex items-center space-x-2">
+            <span class="w-3 h-3 rounded-full bg-pinky-500 animate-ping"></span>
+            <span class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-pinky-800">Mind & Perception Class Project</span>
+        </div>
+        <!-- Admin Access Button -->
+        <button id="admin-access-btn" onclick="openAdminAuth()" class="px-3.5 py-1.5 text-xs sm:text-sm font-medium text-pinky-700 bg-white/80 hover:bg-white rounded-full border border-pinky-200 shadow-sm transition hover:shadow-md flex items-center gap-1.5">
+            <i class="fa-solid fa-lock text-pinky-400 text-xs"></i>
+            <span>see stuff</span>
+        </button>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="w-full max-w-xl my-auto py-6">
+
+        <!-- ================= START SCREEN ================= -->
+        <div id="screen-start" class="bg-white/90 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl shadow-pinky-500/10 border border-pinky-100 text-center card-transition">
+            <div class="w-16 h-16 bg-pinky-100 text-pinky-600 rounded-2xl flex items-center justify-center mx-auto mb-5 text-2xl shadow-inner">
+                <i class="fa-solid fa-feather-pointed"></i>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3 tracking-tight">Self-Perception Survey</h1>
+            <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-6 max-w-md mx-auto">
+                Thank you for participating! Please share your candid, thoughtful reflections. There are no right or wrong answers—just your honest perspective.
+            </p>
+
+            <form onsubmit="event.preventDefault(); startSurvey();" class="space-y-5 text-left">
+                <div>
+                    <label for="participant-name" class="block text-xs font-bold uppercase tracking-wider text-pinky-800 mb-2">Your Name <span class="text-pinky-500">*</span></label>
+                    <input type="text" id="participant-name" required placeholder="e.g. Alex M." class="w-full px-4 py-3 rounded-xl border border-pinky-200 focus:border-pinky-500 focus:ring-4 focus:ring-pinky-500/15 outline-none transition bg-pinky-50/30 text-slate-800 text-base font-medium placeholder:text-slate-400">
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="w-full py-3.5 px-6 rounded-xl bg-pinky-600 hover:bg-pinky-700 text-white font-bold text-base shadow-lg shadow-pinky-500/30 transition transform active:scale-[0.98] glow-btn flex items-center justify-center gap-2">
+                        <span>Begin Survey</span>
+                        <i class="fa-solid fa-arrow-right text-sm"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ================= SURVEY QUESTION CARDS ================= -->
+        <div id="screen-survey" class="hidden bg-white/90 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl shadow-pinky-500/10 border border-pinky-100 card-transition">
+            
+            <!-- Progress Header -->
+            <div class="flex justify-between items-center mb-3">
+                <span id="question-tracker" class="text-xs sm:text-sm font-semibold text-pinky-700">Question 1 of 7</span>
+                <span id="participant-tag" class="text-xs font-semibold px-2.5 py-1 bg-pinky-100 text-pinky-800 rounded-full truncate max-w-[150px]">Participant</span>
+            </div>
+
+            <!-- Modern Pink Progress Bar -->
+            <div class="w-full bg-pinky-100 h-2.5 rounded-full overflow-hidden mb-6 sm:mb-8">
+                <div id="progress-bar" class="bg-gradient-to-r from-pinky-400 to-pinky-600 h-full rounded-full transition-all duration-500 ease-out" style="width: 14.28%;"></div>
+            </div>
+
+            <!-- Question Prompt Title -->
+            <div class="mb-5">
+                <h2 id="question-title" class="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
+                    Question text goes here?
+                </h2>
+                <p id="question-hint" class="text-xs sm:text-sm text-slate-500 mt-1">Take your time and write as much as you like.</p>
+            </div>
+
+            <!-- Written Answer Input -->
+            <div class="mb-6">
+                <textarea id="answer-input" rows="5" placeholder="Type your response here..." class="w-full p-4 rounded-2xl border border-pinky-200 focus:border-pinky-500 focus:ring-4 focus:ring-pinky-500/15 outline-none transition bg-pinky-50/20 text-slate-800 text-sm sm:text-base leading-relaxed placeholder:text-slate-400 resize-y min-h-[140px]"></textarea>
+                <div id="validation-error" class="hidden text-pinky-600 text-xs mt-2 font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span>Please enter a response before continuing.</span>
+                </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="flex items-center justify-between gap-3 pt-2">
+                <button id="prev-btn" onclick="prevQuestion()" class="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
+                    <span>Back</span>
+                </button>
+                <button id="next-btn" onclick="nextQuestion()" class="ml-auto px-6 py-3 rounded-xl bg-pinky-600 hover:bg-pinky-700 text-white font-bold text-sm sm:text-base shadow-md shadow-pinky-500/25 transition transform active:scale-[0.98] flex items-center gap-2">
+                    <span id="next-btn-text">Next Question</span>
+                    <i id="next-btn-icon" class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- THANK YOU / COMPLETION SCREEN -->
+        <div id="screen-thankyou" class="hidden bg-white/90 backdrop-blur-md rounded-3xl p-8 sm:p-10 shadow-xl shadow-pinky-500/10 border border-pinky-100 text-center card-transition">
+            <div class="w-20 h-20 bg-pinky-100 text-pinky-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl shadow-inner animate-bounce">
+                <i class="fa-solid fa-heart"></i>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Response Submitted!</h2>
+            <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-8 max-w-sm mx-auto">
+                Thank you for contributing to my class project. Your honest reflections are immensely valuable!
+            </p>
+            <button onclick="resetSurveyView()" class="py-3 px-6 rounded-xl bg-pinky-100 hover:bg-pinky-200 text-pinky-800 font-bold text-sm transition">
+                Submit Another Response
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-4 text-xs text-pinky-900/60 font-medium">
+        Class Project • Written Self-Perception Survey
+    </footer>
+
+    <!-- ================= ADMIN PASSWORD MODAL ================= -->
+    <div id="modal-admin-auth" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl border border-pinky-100 text-center card-transition">
+            <div class="w-12 h-12 bg-pinky-100 text-pinky-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-xl">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-1">Researcher Access</h3>
+            <p class="text-xs text-slate-500 mb-5">Enter password to view recorded responses.</p>
+            
+            <form onsubmit="event.preventDefault(); verifyAdminPassword();" class="space-y-4">
+                <div>
+                    <input type="password" id="admin-pass-input" placeholder="Password" class="w-full px-4 py-3 rounded-xl border border-pinky-200 focus:border-pinky-500 focus:ring-4 focus:ring-pinky-500/15 outline-none transition text-center font-mono tracking-widest text-lg">
+                    <p id="pass-error" class="hidden text-pinky-600 text-xs mt-2 font-medium">Incorrect password. Try again!</p>
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeAdminAuth()" class="w-1/2 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition">Cancel</button>
+                    <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-pinky-600 hover:bg-pinky-700 text-white font-bold text-sm shadow-md transition">Unlock</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= ADMIN DASHBOARD MODAL ("SEE STUFF") ================= -->
+    <div id="modal-admin-dashboard" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-hidden">
+        <div class="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl border border-pinky-100 overflow-hidden">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-5 bg-gradient-to-r from-pinky-500 to-pinky-600 text-white flex justify-between items-center shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-lg">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold">Collected Study Responses</h3>
+                        <p class="text-xs text-pinky-100" id="submission-count-label">0 total entries stored</p>
+                    </div>
+                </div>
+                <button onclick="closeAdminDashboard()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Toolbar & Actions -->
+            <div class="p-4 bg-pinky-50/50 border-b border-pinky-100 flex flex-wrap gap-3 justify-between items-center shrink-0">
+                <div class="relative flex-1 min-w-[200px]">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="admin-search" oninput="renderAdminResponses()" placeholder="Search by name or response keywords..." class="w-full pl-9 pr-4 py-2 bg-white rounded-xl border border-pinky-200 text-xs sm:text-sm outline-none focus:border-pinky-500">
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="exportDataTXT()" class="px-3 py-2 bg-white border border-pinky-200 hover:bg-pinky-100/50 text-pinky-800 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-file-arrow-down text-pinky-500"></i>
+                        <span>Export Text Summary</span>
+                    </button>
+                    <button onclick="exportDataJSON()" class="px-3 py-2 bg-white border border-pinky-200 hover:bg-pinky-100/50 text-pinky-800 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-code text-pinky-500"></i>
+                        <span>Export JSON</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Response Feed List -->
+            <div id="admin-response-list" class="p-4 sm:p-6 overflow-y-auto space-y-4 flex-1">
+                <!-- Dynamic cards populated via JS -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500 shrink-0">
+                <span>Stored locally in browser</span>
+                <button onclick="clearAllSubmissions()" class="text-pinky-600 hover:text-pinky-800 font-semibold transition flex items-center gap-1">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Clear All Data</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        // --- SURVEY QUESTIONS DATA ---
+        const questions = [
+            {
+                id: 1,
+                title: "How do you think your friends would describe you in 3 words vs. how you would describe yourself in 3 words?",
+                hint: "Contrast outward social perception with your inner identity."
+            },
+            {
+                id: 2,
+                title: "What is one assumption people often make about you when they first meet you that is completely wrong?",
+                hint: "Think about first impressions vs. your true personality."
+            },
+            {
+                id: 3,
+                title: "In a group setting, what role do you naturally fall into (e.g., leader, observer, mediator, entertainer), and do you actually enjoy that role?",
+                hint: "Reflect on how you act around others vs. your internal comfort zone."
+            },
+            {
+                id: 4,
+                title: "What is something you take pride in about yourself that you rarely get to show or talk about at school?",
+                hint: "Share hidden talents, deep values, or personal passions."
+            },
+            {
+                id: 5,
+                title: "When you're facing a stressful situation, what is your immediate instinctual reaction?",
+                hint: "Consider your emotional and physical habits under pressure."
+            },
+            {
+                id: 6,
+                title: "What is a personal strength you think you have, and when was a specific moment you proved it to yourself?",
+                hint: "Support your self-image with a real-life example."
+            },
+            {
+                id: 7,
+                title: "If you could change one aspect of how you react to other people, what would it be?",
+                hint: "Reflect gently on your growth areas and interpersonal habits."
+            }
+        ];
+
+        // --- APP STATE ---
+        let currentQuestionIndex = 0;
+        let participantName = "";
+        let currentAnswers = Array(questions.length).fill("");
+
+        // DOM Element Cache
+        const screenStart = document.getElementById('screen-start');
+        const screenSurvey = document.getElementById('screen-survey');
+        const screenThankYou = document.getElementById('screen-thankyou');
+        
+        const questionTracker = document.getElementById('question-tracker');
+        const participantTag = document.getElementById('participant-tag');
+        const progressBar = document.getElementById('progress-bar');
+        const questionTitle = document.getElementById('question-title');
+        const questionHint = document.getElementById('question-hint');
+        const answerInput = document.getElementById('answer-input');
+        const validationError = document.getElementById('validation-error');
+        
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const nextBtnText = document.getElementById('next-btn-text');
+        const nextBtnIcon = document.getElementById('next-btn-icon');
+
+        // --- SURVEY ENGINE ---
+
+        function startSurvey() {
+            const nameInput = document.getElementById('participant-name');
+            const nameValue = nameInput.value.trim();
+            if (!nameValue) return;
+
+            participantName = nameValue;
+            participantTag.innerText = participantName;
+            currentQuestionIndex = 0;
+            currentAnswers = Array(questions.length).fill("");
+
+            screenStart.classList.add('hidden');
+            screenSurvey.classList.remove('hidden');
+            screenThankYou.classList.add('hidden');
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestionIndex];
+            questionTracker.innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+            questionTitle.innerText = q.title;
+            questionHint.innerText = q.hint;
+            answerInput.value = currentAnswers[currentQuestionIndex] || "";
+            
+            // Progress Bar Update
+            const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+
+            // Error state reset
+            validationError.classList.add('hidden');
+            answerInput.classList.remove('border-pinky-500', 'ring-4', 'ring-pinky-500/15');
+
+            // Button visibility
+            if (currentQuestionIndex === 0) {
+                prevBtn.classList.add('invisible');
+            } else {
+                prevBtn.classList.remove('invisible');
+            }
+
+            if (currentQuestionIndex === questions.length - 1) {
+                nextBtnText.innerText = "Submit Survey";
+                nextBtnIcon.className = "fa-solid fa-paper-plane text-xs";
+            } else {
+                nextBtnText.innerText = "Next Question";
+                nextBtnIcon.className = "fa-solid fa-arrow-right text-xs";
+            }
+
+            answerInput.focus();
+        }
+
+        function nextQuestion() {
+            const val = answerInput.value.trim();
+            if (!val) {
+                validationError.classList.remove('hidden');
+                answerInput.classList.add('border-pinky-500', 'ring-4', 'ring-pinky-500/15');
+                return;
+            }
+
+            // Store response
+            currentAnswers[currentQuestionIndex] = val;
+
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                saveCompleteSubmission();
+            }
+        }
+
+        function prevQuestion() {
+            // Store current input anyway when going back
+            currentAnswers[currentQuestionIndex] = answerInput.value.trim();
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        }
+
+        function saveCompleteSubmission() {
+            const submission = {
+                id: 'sub_' + Date.now(),
+                participant: participantName,
+                timestamp: new Date().toLocaleString(),
+                responses: questions.map((q, idx) => ({
+                    question: q.title,
+                    answer: currentAnswers[idx]
+                }))
+            };
+
+            const existing = getStoredSubmissions();
+            existing.unshift(submission);
+            localStorage.setItem('perception_survey_data', JSON.stringify(existing));
+
+            // Transition to Thank You Screen
+            screenSurvey.classList.add('hidden');
+            screenThankYou.classList.remove('hidden');
+        }
+
+        function resetSurveyView() {
+            document.getElementById('participant-name').value = '';
+            screenThankYou.classList.add('hidden');
+            screenStart.classList.remove('hidden');
+        }
+
+        function getStoredSubmissions() {
+            try {
+                return JSON.parse(localStorage.getItem('perception_survey_data')) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        // --- ADMIN / "SEE STUFF" SECTION ---
+
+        function openAdminAuth() {
+            document.getElementById('admin-pass-input').value = '';
+            document.getElementById('pass-error').classList.add('hidden');
+            document.getElementById('modal-admin-auth').classList.remove('hidden');
+            document.getElementById('admin-pass-input').focus();
+        }
+
+        function closeAdminAuth() {
+            document.getElementById('modal-admin-auth').classList.add('hidden');
+        }
+
+        function verifyAdminPassword() {
+            const passInput = document.getElementById('admin-pass-input').value;
+            if (passInput === '1234robot') {
+                closeAdminAuth();
+                openAdminDashboard();
+            } else {
+                document.getElementById('pass-error').classList.remove('hidden');
+            }
+        }
+
+        function openAdminDashboard() {
+            document.getElementById('modal-admin-dashboard').classList.remove('hidden');
+            renderAdminResponses();
+        }
+
+        function closeAdminDashboard() {
+            document.getElementById('modal-admin-dashboard').classList.add('hidden');
+        }
+
+        function renderAdminResponses() {
+            const container = document.getElementById('admin-response-list');
+            const searchVal = document.getElementById('admin-search').value.toLowerCase();
+            const submissions = getStoredSubmissions();
+
+            document.getElementById('submission-count-label').innerText = `${submissions.length} total participant entry/entries`;
+
+            const filtered = submissions.filter(s => {
+                const matchName = s.participant.toLowerCase().includes(searchVal);
+                const matchAnswers = s.responses.some(r => r.answer.toLowerCase().includes(searchVal));
+                return matchName || matchAnswers;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-400">
+                        <i class="fa-regular fa-folder-open text-4xl mb-3 text-pinky-200"></i>
+                        <p class="font-medium text-sm">No survey responses found.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(sub => `
+                <div class="bg-pinky-50/40 rounded-2xl p-4 sm:p-5 border border-pinky-100 transition hover:bg-pinky-50/70">
+                    <div class="flex justify-between items-start mb-3 border-b border-pinky-100/60 pb-3">
+                        <div>
+                            <span class="text-base font-bold text-slate-900">${escapeHtml(sub.participant)}</span>
+                            <span class="text-xs text-slate-400 block mt-0.5"><i class="fa-regular fa-clock mr-1"></i>${sub.timestamp}</span>
+                        </div>
+                        <button onclick="deleteSubmission('${sub.id}')" class="text-slate-400 hover:text-pinky-600 p-1 transition" title="Delete Entry">
+                            <i class="fa-solid fa-trash-can text-sm"></i>
+                        </button>
+                    </div>
+                    <div class="space-y-3">
+                        ${sub.responses.map((r, i) => `
+                            <div class="text-xs sm:text-sm">
+                                <span class="font-bold text-pinky-900 block mb-1">Q${i+1}: ${escapeHtml(r.question)}</span>
+                                <p class="text-slate-700 bg-white p-3 rounded-xl border border-pinky-100 leading-relaxed font-sans">${escapeHtml(r.answer)}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteSubmission(id) {
+            let submissions = getStoredSubmissions();
+            submissions = submissions.filter(s => s.id !== id);
+            localStorage.setItem('perception_survey_data', JSON.stringify(submissions));
+            renderAdminResponses();
+        }
+
+        function clearAllSubmissions() {
+            if (getStoredSubmissions().length === 0) return;
+            localStorage.removeItem('perception_survey_data');
+            renderAdminResponses();
+        }
+
+        // --- EXPORT FUNCTIONS ---
+
+        function exportDataTXT() {
+            const submissions = getStoredSubmissions();
+            if (submissions.length === 0) return;
+
+            let content = `SELF-PERCEPTION EXPERIMENT - SURVEY RESPONSES\n`;
+            content += `Export Date: ${new Date().toLocaleString()}\n`;
+            content += `Total Participants: ${submissions.length}\n`;
+            content += `=`.repeat(60) + `\n\n`;
+
+            submissions.forEach((sub, index) => {
+                content += `PARTICIPANT #${submissions.length - index}: ${sub.participant}\n`;
+                content += `Submitted At: ${sub.timestamp}\n`;
+                content += `-`.repeat(40) + `\n`;
+                sub.responses.forEach((r, qIdx) => {
+                    content += `[Q${qIdx + 1}] ${r.question}\n`;
+                    content += `ANSWER: ${r.answer}\n\n`;
+                });
+                content += `=`.repeat(60) + `\n\n`;
+            });
+
+            downloadFile(content, `perception_survey_summary_${Date.now()}.txt`, 'text/plain');
+        }
+
+        function exportDataJSON() {
+            const submissions = getStoredSubmissions();
+            if (submissions.length === 0) return;
+            const content = JSON.stringify(submissions, null, 2);
+            downloadFile(content, `perception_survey_data_${Date.now()}.json`, 'application/json');
+        }
+
+        function downloadFile(content, filename, contentType) {
+            const blob = new Blob([content], { type: contentType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
